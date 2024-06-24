@@ -19,14 +19,14 @@ class Vehicle:
 
         # 차량의 기본 물리적 특성 설정
         self.l = 4  # 차량 길이 (미터)
-        self.s0 = 4  # 안전 거리 (미터)
-        self.T = 1  # 시간 헤드웨이 (초)
-        self.v_max = 16.6  # 최대 속도 (m/s)
+        self.s0 = 4  # 안전 거리 (미터) 
+        self.T = 1  # 시간 헤드웨이 (초) ################ 이거 다 어트리뷰트
+        self.v_max = 16.6  # 최대 속도 (m/s) (km/h)로 바꾸기 위해선 16.6 /1000 * 3600
         self.a_max = 1.44  # 최대 가속도 (m/s^2)
         self.b_max = 4.61  # 최대 감속도 (m/s^2)
 
         # 차량의 운행 경로 및 상태 관련 설정
-        self.path = []  # 차량 경로 (도로 세그먼트 목록)
+        self.path = []  # 차량 경로 (도로 세그먼트 목록) ###############좌표든 뭐든 들어갈거
         self.current_road_index = 0  # 현재 도로의 인덱스
 
         # 동적인 차량의 위치, 속도, 가속도
@@ -41,9 +41,9 @@ class Vehicle:
         self._v_max = self.v_max  # 내부 사용을 위한 최대 속도 변수 설정
 
     def update(self, lead, dt):
-        # 차량의 위치와 속도 업데이트
+        # 차량의 위치와 속도 업데이트  v=v0 * at
         if self.v + self.a * dt < 0:
-            # 속도가 0 이하가 되는 경우 위치 업데이트 및 속도를 0으로 설정
+          ###############  # 속도가 0 이하가 되는 경우 위치 업데이트 및 속도를 0으로 설정
             self.x -= 1 / 2 * self.v * self.v / self.a 
             self.v = 0
         else:
@@ -51,8 +51,10 @@ class Vehicle:
             self.v += self.a * dt
             self.x += self.v * dt + self.a * dt * dt / 2
 
-        # 가속도 업데이트
-        alpha = 0
+        # 가속도 업데이트  ############## si = xi-x(i-1)-li , 델타vi=lvi-v(i-1)l
+        
+         #차량 속력이 최대희망속도 가까워질수록 가속도 값은 작아짐
+        # alpha = 0
         if lead:
             # 앞차와의 거리 및 속도 차이 계산
             delta_x = lead.x - self.x - lead.l
@@ -66,9 +68,10 @@ class Vehicle:
         # 새로운 가속도 계산
         self.a = self.a_max * (1 - (self.v / self.v_max)**4 - alpha**2)
 
-        # 정지명령을 받았을 때 서서히 감속하도록 함 
+        ######## 정지명령을 받았을 때 서서히 감속하도록 함 ###트루면 정지명령을 받았다,  
         if self.stopped:
-            self.a = -self.b_max * self.v / self.v_max
+            self.a = -self.b_max * self.v / self.v_max #v/vmax는 1보다 작다 따라서 a는 0보다 크고 b.max보다 작거나 같다
+                                                       #(b.max = 최대감속도)
 
 
     # # PPT에 있는 IDM을 그대로 구현한 코드 
